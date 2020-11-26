@@ -1,0 +1,17 @@
+version: "3"
+
+services:
+  db:
+    image: postgres
+    #restart: always
+    environment:
+      POSTGRES_PASSWORD: password
+    volumes:
+       - ./db:/docker-entrypoint-initdb.d
+    ports:
+      - "1234:5432" # host:container
+
+  api:
+    build: ./api
+    ports:
+      - "8000:8000"
