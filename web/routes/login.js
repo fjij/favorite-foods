@@ -10,9 +10,7 @@ router.post('/', async (req, res) => {
   const result = await db.query(query, [username]);
   if (result.rows[0]) {
     const { password_hash } = result.rows[0];
-    console.log(password_hash);
     const match = await bcrypt.compare(password, password_hash);
-    console.log(match);
     if (match) {
       res.cookie('username', username, { signed: true }).redirect('/');
     } else {
