@@ -1,11 +1,14 @@
 const express = require('express');
-const app = express()
-const port = process.env.PORT | 8000
+const db = require('./db');
+const app = express();
+const port = process.env.PORT | 8000;
 
-app.get('/', (_, res) => {
-  res.send('Hello world!')
+app.get('/food', async (_, res) => {
+  const query = "SELECT * FROM food";
+  const result = await db.query(query);
+  res.json(result.rows);
 })
 
 app.listen(port, () => {
-  console.log(`App listening on port ${port}`)
+  console.log(`App listening on port ${port}`);
 })
