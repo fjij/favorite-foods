@@ -20,6 +20,6 @@ CREATE TABLE likes (
 
 -- Mocking
 
-INSERT INTO food (name, emoji) VALUES ('pizza', '🍕️');
-INSERT INTO food (name, emoji) VALUES ('cheese whiz', '🧀️');
-INSERT INTO food (name, emoji) VALUES ('pasta', '🍝️');
+-- INSERT INTO food (name, emoji) VALUES ('pizza', '🍕️');
+-- INSERT INTO food (name, emoji) VALUES ('cheese whiz', '🧀️');
+-- INSERT INTO food (name, emoji) VALUES ('pasta', '🍝️');

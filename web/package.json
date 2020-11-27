@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha --timeout 10000"
   },
   "keywords": [],
   "author": "",
@@ -20,5 +20,10 @@
     "helmet": "^4.2.0",
     "cors": "^2.8.5",
     "express-validator": "^6.7.0"
+  },
+  "devDependencies": {
+    "mocha": "^8.2.1",
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0"
   }
 }
