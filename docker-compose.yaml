@@ -19,6 +19,8 @@ services:
       - PGPASSWORD=password 
       - PGDATABASE=postgres 
       - PGPORT=5432 
+      - PORT=8000
+      - COOKIE_SECRET=secret
     ports:
       - "8000:8000"
     depends_on:
