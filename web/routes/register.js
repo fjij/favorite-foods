@@ -25,7 +25,7 @@ router.post('/', [
   const password_hash = await bcrypt.hash(password, saltRounds);
   try {
     const result = await db.query(query, [username, password_hash]);
-    res.cookie('username', username, { signed: true }).redirect('/');
+    res.cookie('username', username, { signed: true }).status(200).send();
   } catch {
     res.status(409).json({ errors: [{
       "location": "body",
