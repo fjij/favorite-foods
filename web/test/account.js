@@ -135,7 +135,7 @@ describe('Account', () => {
         throw new Error('test not implemented');
       });
 
-      it('should fail invalid input', async () => {
+      it('should fail if the required inputs are not supplied', async () => {
         throw new Error('test not implemented');
       });
 
