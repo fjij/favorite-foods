@@ -17,6 +17,6 @@ router.post('/', async (req, res) => {
       res.status(401).send('incorrect username or password');
     }
   } else {
-    res.status(401).send('incorrect username or password>');
+    res.status(401).send('incorrect username or password');
   }
 });
