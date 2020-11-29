@@ -9,16 +9,20 @@ const { mockFood, mockAccounts, mockLikes } = require('./mocking');
 chai.use(chaiHttp);
 
 describe('Account', () => {
+
   beforeEach(async () => {
     await db.query("DELETE FROM food");
     await db.query("DELETE FROM account");
     await db.query("DELETE FROM likes");
   });
 
-  describe('/GET api/account/:account', () => {
+  describe('/GET /api/account/:account', () => {
+
     describe('General', () => {
+
       let username = 'abc';
       let likedFood;
+
       beforeEach(async () => {
         const pizza = {name: 'pizza', emoji: '🍕️'};
         const pasta = {name: 'pasta', emoji: '🍝️'};
@@ -57,11 +61,14 @@ describe('Account', () => {
         res.body.length.should.be.eql(3);
         res.body.should.be.deep.eql(likedFood);
       });
+
     });
 
     describe('Pagination', () => {
+
       let food;
       let username='abc';
+
       beforeEach(async () => {
         food = [];
         for (var i = 0; i < 20; i ++) {
@@ -74,6 +81,7 @@ describe('Account', () => {
         }
         food.reverse();
       });
+
       it('should paginate', async () => {
         const res = await chai.request(app).get(`/api/account/${username}`);
         res.should.have.status(200);
@@ -81,6 +89,7 @@ describe('Account', () => {
         res.body.length.should.be.eql(10);
         res.body.should.be.deep.eql(food.slice(0, 10));
       });
+
       it('should offset pages', async () => {
         const res = await chai.request(app).get(`/api/account/${username}`)
           .query({page: 2});
@@ -89,6 +98,7 @@ describe('Account', () => {
         res.body.length.should.be.eql(10);
         res.body.should.be.deep.eql(food.slice(10, 20));
       });
+
       it('should use limit', async () => {
         const res = await chai.request(app).get(`/api/account/${username}`)
           .query({limit: 5});
@@ -97,6 +107,7 @@ describe('Account', () => {
         res.body.length.should.be.eql(5);
         res.body.should.be.deep.eql(food.slice(0, 5));
       });
+
       it('should use limit + page', async () => {
         const res = await chai.request(app).get(`/api/account/${username}`)
           .query({limit: 5, page: 3});
@@ -105,6 +116,34 @@ describe('Account', () => {
         res.body.length.should.be.eql(5);
         res.body.should.be.deep.eql(food.slice(10, 15));
       });
+
     });
+  });
+
+  describe('/POST /api/account', () => {
+    describe('General', () => {
+
+      it('should fail when user is not logged in', async () => {
+        throw new Error('test not implemented');
+      });
+
+      it('should add a liked food for a logged in user', async () => {
+        throw new Error('test not implemented');
+      });
+
+      it('should fail for a non-existent food', async () => {
+        throw new Error('test not implemented');
+      });
+
+      it('should fail invalid input', async () => {
+        throw new Error('test not implemented');
+      });
+
+      it('should fail if the food is already liked', async () => {
+        throw new Error('test not implemented');
+      });
+
+    });
+
   });
 });
