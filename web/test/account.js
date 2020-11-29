@@ -123,24 +123,65 @@ describe('Account', () => {
   describe('/POST /api/account', () => {
     describe('General', () => {
 
+      let agent;
+      let username = 'abc';
+
+      beforeEach(async() => {
+        agent = chai.request.agent(app);
+        await agent.post('/register').type('form').send({
+          username, password: '12345678'
+        });
+        await mockFood([
+          {name: 'pizza', emoji: '🍕️'},
+          {name: 'cheese whiz', emoji: '🧀️'},
+          {name: 'pasta', emoji: '🍝️'},
+        ]);
+      });
+
+      afterEach(async() => {
+        agent.close();
+      });
+
       it('should fail when user is not logged in', async () => {
-        throw new Error('test not implemented');
+        const res = await chai.request(app).post('/api/account').type('form')
+          .send({
+            name: 'pizza'
+          });
+        res.should.have.status(403);
       });
 
       it('should add a liked food for a logged in user', async () => {
-        throw new Error('test not implemented');
+        const res1 = await agent.post('/api/account').type('form').send({
+          name: 'pizza'
+        });
+        res1.should.have.status(200);
+        const res2 = await agent.get(`/api/account/${username}`);
+        res2.should.have.status(200);
+        res2.body.should.deep.eql([
+          {name: 'pizza', emoji: '🍕️'},
+        ]);
       });
 
       it('should fail for a non-existent food', async () => {
-        throw new Error('test not implemented');
+        const res = await agent.post('/api/account').type('form').send({
+          name: 'imaginary avocado'
+        });
+        res.should.have.status(400);
       });
 
       it('should fail if the required inputs are not supplied', async () => {
-        throw new Error('test not implemented');
+        const res = await agent.post('/api/account').type('form').send({});
+        res.should.have.status(400);
       });
 
       it('should fail if the food is already liked', async () => {
-        throw new Error('test not implemented');
+        await agent.post('/api/account').type('form').send({
+          name: 'pizza'
+        });
+        const res = await agent.post('/api/account').type('form').send({
+          name: 'pizza'
+        });
+        res.should.have.status(409);
       });
 
     });
