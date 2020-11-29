@@ -12,7 +12,7 @@ router.post('/', async (req, res) => {
     const { password_hash } = result.rows[0];
     const match = await bcrypt.compare(password, password_hash);
     if (match) {
-      res.cookie('username', username, { signed: true }).redirect('/');
+      res.cookie('username', username, { signed: true }).status(200).send();
     } else {
       res.status(401).send('incorrect username or password');
     }
