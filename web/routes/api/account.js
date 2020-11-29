@@ -48,16 +48,24 @@ router.post('/', auth(), [
   next();
 }, async (req, res) => {
   const { name } = req.body;
+  if (!name) 
+      return res.status(400).json({ error: 'no input provided' });
   const username = req.username;
+  const checkQuery = 'SELECT COUNT(*) FROM food WHERE name = $1';
   const query = `INSERT INTO likes (account_uuid, food_uuid)
 SELECT account.uuid, food.uuid FROM account JOIN food ON true
 WHERE account.username=$1 AND food.name=$2`;
   try {
-    await db.query(query, [username, name]);
+    const [_, checkResult] = await Promise.all([
+      db.query(query, [username, name]),
+      db.query(checkQuery, [name]),
+    ]);
+    if (parseInt(checkResult.rows[0].count) != 1) {
+      return res.status(404).json({ error: 'food not found' });
+    }
     res.status(200).send('OK');
   } catch(e) {
-    console.error(e);
-    res.status(400).json({ errors: [{
+    res.status(409).json({ errors: [{
       "location": "body",
       msg: "You already like this food",
       param: "name"

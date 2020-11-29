@@ -166,7 +166,7 @@ describe('Account', () => {
         const res = await agent.post('/api/account').type('form').send({
           name: 'imaginary avocado'
         });
-        res.should.have.status(400);
+        res.should.have.status(404);
       });
 
       it('should fail if the required inputs are not supplied', async () => {
