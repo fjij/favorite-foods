@@ -31,7 +31,7 @@ describe('Account', () => {
         await mockLikes([ {username, name: 'pizza'}, ]);
         await mockLikes([ {username, name: 'pasta'}, ]);
         await mockLikes([ {username, name: 'grapes'}, ]);
-        likedFood = [ grapes, pizza, pasta ];
+        likedFood = [ grapes, pasta, pizza ];
       });
 
       it('should fail on an invalid user', async () => {
@@ -68,12 +68,10 @@ describe('Account', () => {
           food.push({name: i.toString(), emoji: ''});
         }
         await Promise.all([mockFood(food), mockAccounts([username])]);
-        const likes = [];
         for (var i = 0; i < 20; i ++) {
           const name = food[i].name;
-          likes.push({name, username});
+          await mockLikes([{name, username}]);
         }
-        await mockLikes(likes);
         food.reverse();
       });
       it('should paginate', async () => {
