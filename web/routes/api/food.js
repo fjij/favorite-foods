@@ -32,14 +32,30 @@ router.get('/', async (req, res) => {
 
 router.get('/:name', async (req, res) => {
   const { name } = req.params;
-  const query = `SELECT * FROM ${popularFoods} WHERE name = $1`;
+  const { page = 1, limit = 10 } = req.query;
+  const offset = (page - 1) * limit;
+  const foodQuery = `SELECT * FROM ${popularFoods} WHERE name = $1`;
+  const usernamesQuery = `
+    SELECT account.username FROM
+      food JOIN likes ON food.uuid = likes.food_uuid
+           JOIN account ON likes.account_uuid = account.uuid
+      WHERE food.name = $1
+    ORDER BY account.username
+    LIMIT $2 OFFSET $3
+  `;
   try {
-    const result = await db.query(query, [name]);
-    if (result.rows[0]) {
+    const [foodResult, usernamesResult] = await Promise.all([
+      db.query(foodQuery, [name]),
+      db.query(usernamesQuery, [name, limit, offset])
+    ]);
+    if (foodResult.rows[0]) {
       res.json({
-        name: result.rows[0].name,
-        emoji: result.rows[0].emoji,
-        popularity: parseInt(result.rows[0].popularity),
+        food: {
+          name: foodResult.rows[0].name,
+          emoji: foodResult.rows[0].emoji,
+          popularity: parseInt(foodResult.rows[0].popularity),
+        },
+        usernames: usernamesResult.rows.map(({username}) => username)
       });
     } else {
       res.status(404).send();

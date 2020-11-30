@@ -144,10 +144,12 @@ describe('Food', () => {
 
   describe('/GET /api/food/:name', () => {
 
+    let usernames;
+
     beforeEach(async () => {
-      await Promise.all([
+      usernames = (await Promise.all([
         mockFood(), mockAccounts()
-      ]);
+      ]))[1];
       await mockLikes();
     });
 
@@ -155,7 +157,7 @@ describe('Food', () => {
       const name = 'pizza';
       const res = await chai.request(app).get(`/api/food/${name}`);
       res.should.have.status(200);
-      res.body.should.deep.eql( 
+      res.body.food.should.deep.eql( 
         {name: 'pizza', emoji: '🍕️', popularity: 3}
       );
     });
@@ -164,6 +166,30 @@ describe('Food', () => {
       const name = 'pencils';
       const res = await chai.request(app).get(`/api/food/${name}`);
       res.should.have.status(404);
+    });
+
+    it('should list usernames who like the food', async () => {
+      const name = 'pizza';
+      const res = await chai.request(app).get(`/api/food/${name}`);
+      res.should.have.status(200);
+      usernames.forEach(username => {
+        res.body.usernames.should.deep.contain(username);
+      });
+    });
+
+    it('should list usernames in alphabetical order', async () => {
+      const name = 'pizza';
+      const res = await chai.request(app).get(`/api/food/${name}`);
+      res.should.have.status(200);
+      res.body.usernames.should.deep.eql(usernames);
+    });
+
+    it('should support username pagination', async () => {
+      const name = 'pizza';
+      const res = await chai.request(app).get(`/api/food/${name}`)
+        .query({ limit: 2, page: 2 });
+      res.should.have.status(200);
+      res.body.usernames.should.deep.eql([usernames[2]]);
     });
 
   });
