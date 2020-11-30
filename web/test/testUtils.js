@@ -1,5 +1,11 @@
 const db = require('../db');
 
+async function resetDb() {
+  await db.query("DELETE FROM food");
+  await db.query("DELETE FROM account");
+  await db.query("DELETE FROM likes");
+}
+
 async function mockFood(food = [
   {name: 'pizza', emoji: '🍕️'},
   {name: 'cheese whiz', emoji: '🧀️'},
@@ -34,4 +40,4 @@ WHERE account.username=$1 AND food.name=$2`, [username, name])));
   return likes;
 }
 
-module.exports = { mockFood, mockAccounts, mockLikes };
+module.exports = { resetDb, mockFood, mockAccounts, mockLikes };

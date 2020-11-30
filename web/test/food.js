@@ -5,7 +5,8 @@ const chaiHttp = require('chai-http');
 const app = require('../app');
 const should = chai.should();
 
-const { mockFood, mockAccounts, mockLikes } = require('./mocking');
+const { mockFood, mockAccounts, mockLikes } = require('./testUtils');
+const { resetDb } = require('./testUtils');
 
 chai.use(chaiHttp);
 
@@ -13,11 +14,9 @@ chai.use(chaiHttp);
 
 describe('Food', () => {
 
-  beforeEach(async () => {
-    await db.query("DELETE FROM food");
-    await db.query("DELETE FROM account");
-    await db.query("DELETE FROM likes");
-  });
+  beforeEach(resetDb);
+
+  after(resetDb);
 
   describe('/GET api/food', () => {
 

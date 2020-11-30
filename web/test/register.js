@@ -5,16 +5,15 @@ const chaiHttp = require('chai-http');
 const app = require('../app');
 const bcrypt = require('bcrypt');
 const expect = chai.expect;
+const { resetDb } = require('./testUtils');
 
 chai.use(chaiHttp);
 
 describe('Register', () => {
 
-  beforeEach(async () => {
-    await db.query("DELETE FROM food");
-    await db.query("DELETE FROM account");
-    await db.query("DELETE FROM likes");
-  });
+  beforeEach(resetDb);
+
+  after(resetDb);
 
   describe('/POST /register', () => {
 
