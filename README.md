@@ -1,4 +1,4 @@
-# Favorite Foods
+# Favorite Foods 🍕️
 
 Keep track of your favorite foods and discover new foods you might like.
 
