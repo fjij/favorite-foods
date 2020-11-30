@@ -12,18 +12,22 @@ chai.use(chaiHttp);
 
 
 describe('Food', () => {
+
   beforeEach(async () => {
     await db.query("DELETE FROM food");
     await db.query("DELETE FROM account");
     await db.query("DELETE FROM likes");
   });
+
   describe('/GET api/food', () => {
+
     it('should give nothing by default', async () => {
       const res = await chai.request(app).get('/api/food');
       res.should.have.status(200);
       res.body.should.be.a('array');
       res.body.length.should.be.eql(0);
     });
+
     it('should return mocked food', async () => {
       const food = await mockFood();
       const expectedFood = food.map(e => ({...e, popularity: 0}));
@@ -35,15 +39,19 @@ describe('Food', () => {
         res.body.should.deep.include(item);
       });
     });
+
     describe('Popularity', () => {
+
       let food;
       let pop;
+
       beforeEach(async () => {
         food = await mockFood();
         pop = { pizza: 3, pasta: 2, 'cheese whiz': 0 }
         await mockAccounts();
         await mockLikes();
       });
+
       it('should calculate popularity', async () => {
         const expectedFood = food.map(f => ({...f, popularity: pop[f.name]}));
         const res = await chai.request(app).get('/api/food');
@@ -54,6 +62,7 @@ describe('Food', () => {
           res.body.should.deep.include(item);
         });
       });
+
       it('should sort by popularity', async () => {
         const expectedFood = food.map(f => ({...f, popularity: pop[f.name]}))
           .sort((a, b) => b.popularity - a.popularity);
@@ -65,9 +74,13 @@ describe('Food', () => {
           res.body.should.deep.include(item);
         });
       });
+
     });
+
     describe('Pagination', () => {
+
       let food;
+      
       beforeEach(async () => {
         food = [];
         for (var i = 0; i < 20; i ++) {
@@ -90,6 +103,7 @@ describe('Food', () => {
         food.forEach((element, idx) => { element.popularity = idx });
         food.reverse();
       });
+
       it('should paginate', async () => {
         const res = await chai.request(app).get('/api/food');
         res.should.have.status(200);
@@ -97,6 +111,7 @@ describe('Food', () => {
         res.body.length.should.be.eql(10);
         res.body.should.be.deep.eql(food.slice(0, 10));
       });
+
       it('should offset pages', async () => {
         const res = await chai.request(app)
           .get('/api/food').query({page: 2});
@@ -105,6 +120,7 @@ describe('Food', () => {
         res.body.length.should.be.eql(10);
         res.body.should.be.deep.eql(food.slice(10, 20));
       });
+
       it('should use limit', async () => {
         const res = await chai.request(app)
           .get('/api/food').query({limit: 5});
@@ -113,6 +129,7 @@ describe('Food', () => {
         res.body.length.should.be.eql(5);
         res.body.should.be.deep.eql(food.slice(0, 5));
       });
+
       it('should use limit + page', async () => {
         const res = await chai.request(app)
           .get('/api/food').query({limit: 5, page: 3});
@@ -121,6 +138,35 @@ describe('Food', () => {
         res.body.length.should.be.eql(5);
         res.body.should.be.deep.eql(food.slice(10, 15));
       });
+
     });
+
   });
+
+  describe('/GET /api/food/:name', () => {
+
+    beforeEach(async () => {
+      await Promise.all([
+        mockFood(), mockAccounts()
+      ]);
+      await mockLikes();
+    });
+
+    it('should get info about a particular food', async () => {
+      const name = 'pizza';
+      const res = await chai.request(app).get(`/api/food/${name}`);
+      res.should.have.status(200);
+      res.body.should.deep.eql( 
+        {name: 'pizza', emoji: '🍕️', popularity: 3}
+      );
+    });
+
+    it('should fail on food not found', async () => {
+      const name = 'pencils';
+      const res = await chai.request(app).get(`/api/food/${name}`);
+      res.should.have.status(404);
+    });
+
+  });
+
 });
