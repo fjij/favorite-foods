@@ -1,4 +1,3 @@
-const db = require('../db');
 module.exports = () => {
   return async (req, res, next) => {
     const { username } = req.signedCookies;
@@ -6,7 +5,7 @@ module.exports = () => {
       req.username = username;
       next();
     } else {
-      res.clearCookie('username').status(403).send();
+      res.cookie('username', '').status(403).send();
     }
   };
 }
