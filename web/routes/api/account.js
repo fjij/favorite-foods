@@ -31,7 +31,7 @@ router.get('/:username', async (req, res) => {
   }
 });
 
-router.post('/', auth(), [
+const nameMiddleware = [
   body('name')
     .custom(value => {
       if (/^[a-zA-Z ]+$/.test(value)) {
@@ -39,28 +39,32 @@ router.post('/', auth(), [
       }
       throw new Error('Invalid value');
     })
-    .trim()
-], (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-  next();
-}, async (req, res) => {
-  const { name } = req.body;
-  if (!name) 
+    .trim(),
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    next();
+  },
+  (req, res, next) => {
+    const { name } = req.body;
+    if (!name) 
       return res.status(400).json({ error: 'no input provided' });
+    next();
+  },
+]
+
+router.post('/', auth(), nameMiddleware, 
+async (req, res) => {
+  const { name } = req.body;
   const username = req.username;
-  const checkQuery = 'SELECT COUNT(*) FROM food WHERE name = $1';
   const query = `INSERT INTO likes (account_uuid, food_uuid)
 SELECT account.uuid, food.uuid FROM account JOIN food ON true
 WHERE account.username=$1 AND food.name=$2`;
   try {
-    const [_, checkResult] = await Promise.all([
-      db.query(query, [username, name]),
-      db.query(checkQuery, [name]),
-    ]);
-    if (parseInt(checkResult.rows[0].count) != 1) {
+    const result = await db.query(query, [username, name]);
+    if (result.rowCount != 1) {
       return res.status(404).json({ error: 'food not found' });
     }
     res.status(200).send('OK');
@@ -70,5 +74,26 @@ WHERE account.username=$1 AND food.name=$2`;
       msg: "You already like this food",
       param: "name"
     }]});
+  }
+});
+
+router.delete('/', auth(), nameMiddleware, 
+async (req, res) => {
+  const { name } = req.body;
+  const username = req.username;
+  const query = `
+     DELETE FROM likes
+     WHERE food_uuid IN
+     ( SELECT uuid AS food_uuid FROM food WHERE name = $1)
+     AND account_uuid IN
+     ( SELECT uuid AS account_uuid FROM account WHERE username = $2)
+  `;
+  try {
+    const result = await db.query(query, [name, username]);
+    if (result.rowCount != 1)
+      return res.status(404).json({ error: 'food not found' });
+    res.status(200).send('OK');
+  } catch(e) {
+    res.status(500).json({ error: 'internal server error' });
   }
 });
