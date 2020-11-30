@@ -11,6 +11,16 @@ export async function getFood(page, limit) {
   }
 }
 
+export async function getSingleFood(name) {
+  try {
+    const response = await axios.get(`/api/food/${name}`);
+    return response.data;
+  } catch (e) {
+    console.log(e);
+    throw new Error("Couldn't get food :(");
+  }
+}
+
 export async function getAccount(username) {
   try {
     const response = await axios.get(`/api/account/${username}`);
@@ -54,6 +64,30 @@ export async function login(username, password) {
   } catch (e) {
     console.log(e);
     throw new Error("Couldn't login :(");
+  }
+}
+
+export async function logout() {
+  try {
+    await axios.post('/logout');
+  } catch (e) {
+    console.log(e);
+    throw new Error("Couldn't logout :(");
+  }
+}
+
+export async function deleteFood(name) {
+  try {
+    await axios.delete(
+      `/api/account`,
+      qs.stringify({ name }),
+      { headers: {
+        'content-type': 'application/x-www-form-urlencoded;charset=utf-8'
+      },
+    });
+  } catch (e) {
+    console.log(e);
+    throw new Error("Couldn't delete food :(");
   }
 }
 
